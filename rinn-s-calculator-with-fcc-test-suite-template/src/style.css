@@ -1,0 +1,89 @@
+#calculatorFrame{
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-top:  0px;
+    margin-left: 0px;
+    transform: translate(-50%, -50%);
+    width: 400px;
+    height: 350px;
+    background-color: grey;
+    font-weight: 1000;
+    font-size: 20px;
+    font-family: "Helvetica"
+}
+
+#display{
+    box-sizing: border-box;
+    margin-top: 10px;
+    margin-left: 10px;
+    margin-right: 10px;
+    margin-bottom: 5px;
+    padding: 10px;
+    height: 20%;
+    background-color: black;
+    color: green;
+    text-align: right;
+    display: table-cell;
+    vertical-align: middle;
+    font-size: 40px;
+   
+    
+}
+
+#button_container{
+}
+
+#clear{
+  background-color: red;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#clear:active{
+  background-color: rgb(200, 100, 100);
+}
+
+.digit{
+  background-color: rgb(180, 180, 180);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.digit:active{
+  background-color: rgb(100, 100, 100);
+}
+
+.execution{
+  background-color:orange;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.execution:active{
+  background-color: rgb(200, 200, 100)
+}
+
+.button_container{
+  margin-top: 5px;
+  margin-bottom: 10px;
+  margin-left: 10px;
+  margin-right: 10px;
+  height: 80%;
+  display: grid;
+  grid-gap: 5px;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+}
+
+.clearDiv{
+  grid-column: 1/4;
+}
+
+.equalsDiv{
+  grid-column: 3/5;
+}
