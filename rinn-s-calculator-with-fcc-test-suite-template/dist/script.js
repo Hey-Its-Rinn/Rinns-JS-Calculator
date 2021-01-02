@@ -3,13 +3,15 @@ let display = '0';
 // true if number CURRENTLY BEING ENTERED is negative
 let isNegative = false;
 // used exclusively to store term for repeated operations (pressing = more than once)
-let memory1;
+let memory1 = null;
 // used to store the last term while the next term is being entered. This is mostly so you can press = repeatedly
-let memory2;
+let memory2 = null;
 // used to keep track of the operation to execute when another operation or = is commanded
-let lastOperator;
+let lastOperator = null;
 // used to decide if - operator toggles negative number entry or if actually 
 let awaitingNextEntry = true;
+// errors encountered my be "Div by Zero", "Too Big", or "Too Small"
+let error = null;
 
 // for debugging
 function logState() {
@@ -18,17 +20,23 @@ function logState() {
   '\nmemory1: ' + memory1 +
   '\nmemory2: ' + memory2 +
   '\nlastOperator: ' + lastOperator +
-  '\nawaitingNextEntry: ' + awaitingNextEntry);
+  '\nawaitingNextEntry: ' + awaitingNextEntry +
+  '\nerror: ' + error);
 }
 
 // updates the display
 function updateDisplay() {
-  if (isNegative) {
-    document.getElementById("display").innerHTML = '-' + display;
+  console.log('updateDisplay() called');
+  if (error !== null) {
+    document.getElementById("display").innerHTML = 'Err: ' + error;
   } else {
-    document.getElementById("display").innerHTML = display;
+    if (isNegative) {
+      document.getElementById("display").innerHTML = '-' + display;
+    } else {
+      document.getElementById("display").innerHTML = display;
+    }
+    logState();
   }
-  logState();
 }
 
 //resets to defaults
@@ -40,7 +48,9 @@ function clearAndReset() {
   memory2 = null;
   lastOperator = null;
   awaitingNextEntry = true;
+  error = null;
   updateDisplay();
+
 }
 
 // used when entering a digit
@@ -56,6 +66,11 @@ function addDigit(digit) {
   */
 
   console.log('addDigit() called');
+
+  if (error !== null) {
+    // user must press clear after an error
+    return;
+  }
 
   // entering any digit will flip this to false, if it's not already false, and reset the display to 0.
   if (awaitingNextEntry) {
@@ -104,6 +119,11 @@ function updateMemory() {
 
   console.log('updateMemory() called');
 
+  if (error !== null) {
+    // user must press clear after an error
+    return;
+  }
+
   let firstTerm;
   let secondTerm;
   let result;
@@ -145,16 +165,50 @@ function updateMemory() {
     } else if (lastOperator === '*') {
       memory2 = firstTerm * secondTerm;
     } else if (lastOperator === '/') {
+      if (secondTerm === 0) {
+        error = "Div by 0";
+        updateDisplay();
+        return;
+      }
       memory2 = firstTerm / secondTerm;
     }
+
+    console.log(memory2 + ' stored in memory2');
+
+    // ensures the number is not too big or too small for the display.
+    if (memory2 > 9999999999999) {
+      error = "Too Big";
+    } else if (Math.abs(memory2) < 0.000000000001) {
+      error = 'Too Small';
+    }
+    // if the number is not too big or too small, but has a lot of decimals.
     if (memory2.toString().length >= 13) {
-      display = memory2.toFixed(10);
-    } else {
-      if (memory2 >= 0) {
-        isNegative = false;
+      // decimals between 0 and 1
+      if (Math.abs(memory2) < 1) {
+        // truncate all but 12 decimals
+        display = Math.abs(memory2).toFixed(12);
+        // numbers bigger than 1
+      } else {
+        // grab the first 13 characters (12 digits and a decimal point)
+        display = Math.abs(memory2).toString().substring(0, 13);
       }
+    } else {
       // absolute value because display is a string, and whether or not it should be negative is a bool. This prevents stringifying a negative sign.
       display = Math.abs(memory2);
+    }
+
+    display = display.toString();
+
+    if (display.includes('.') && display[display.length - 1] === '0') {
+      while (display[display.length - 1] === '0') {
+        display = display.slice(0, -1);
+      }
+    }
+
+    if (memory2 >= 0) {
+      isNegative = false;
+    } else {
+      isNegative = true;
     }
   }
 }
